@@ -1,11 +1,8 @@
 body {
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  background-color: white;
+  margin: 20px;
 }
 
-input[type=text] {
-  width: 100px;
-}
-
-a {
-  color: #00B7FF;
+h2 {
+  margin: 20px 0;
 }
