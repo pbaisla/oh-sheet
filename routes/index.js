@@ -21,8 +21,7 @@ router.get('/sheet/:url', function(req, res, next) {
   Sheet.findOne({ url: url }, function(err, sheet) {
     if(err)
       res.send(err);
-    console.log(sheet);
-    res.render('sheet', { sheet: sheet.cells||[] });
+    res.render('sheet', { sheet: ((sheet) ? sheet.cells : []) });
   });
 });
 
@@ -34,14 +33,40 @@ module.exports = function(io) {
     });
 
     socket.on('save', function(data) {
-      Sheet.findOneAndUpdate(
+      Sheet.findOne(
           { url: data.url },
-          { url: data.url, cells: data.cells },
-          { upsert: true, new: true },
           function(err, sheet) {
             if(err)
               console.log(err);
-            console.log(sheet.url + " saved");
+            if(sheet) {
+
+              for(var i=0; i < data.cells.length; i++) {
+                var ind = sheet.cells.findIndex(function(element, index, array){
+                  if((element.row == data.cells[i].row) && (element.col == data.cells[i].col))
+                    return true;
+                  return false;
+                });
+
+                if(ind > -1) {
+                  sheet.cells[ind] = data.cells[i];
+                }
+                else {
+                  sheet.cells.push(data.cells[i]);
+                }
+              }
+            }
+            else {
+              sheet = new Sheet({ url: data.url, cells: data.cells });
+            }
+            Sheet.update(
+                { url: data.url },
+                sheet,
+                { upsert: true, new: true},
+                function(err, sheet){
+                  if(err)
+                    console.log(err);
+                }
+              );
           }
       );
     });
