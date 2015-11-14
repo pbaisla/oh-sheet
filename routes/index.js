@@ -33,13 +33,14 @@ module.exports = function(io) {
     });
 
     socket.on('save', function(data) {
+	io.to(data.url).emit('changes',data.cells);
       Sheet.findOne(
           { url: data.url },
           function(err, sheet) {
             if(err)
               console.log(err);
             if(sheet) {
-
+		
               for(var i=0; i < data.cells.length; i++) {
                 var ind = sheet.cells.findIndex(function(element, index, array){
                   if((element.row == data.cells[i].row) && (element.col == data.cells[i].col))

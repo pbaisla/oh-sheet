@@ -27,6 +27,14 @@
         console.log(data);
         socket.emit('sheet.url', { url: url });
       });
+	
+      socket.on('changes',function(input) {
+	console.log(input);
+	for(var i=0;i<input.length;i++){
+		data[input[i].row][input[i].col]=input[i].data;
+		}
+	table.render();
+	});
 
       var data = [[]];
       var cells = <%- JSON.stringify(sheet) %>;
