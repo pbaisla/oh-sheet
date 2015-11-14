@@ -19,8 +19,14 @@
     </div>
 
     <div id="sheet" class="dataTable"></div>
-
+    <script src="/socket.io/socket.io.js"></script>
     <script>
+      var socket = io.connect(window.location.origin);
+      socket.on('news', function (data) {
+        console.log(data);
+        socket.emit('save', { url: window.location.pathname.split("/")[2] });
+      });
+
       var data = [];
       var cells = <%- JSON.stringify(sheet) %>;
 

@@ -3,7 +3,6 @@ var Schema = mongoose.Schema;
 
 var SheetSchema = new Schema({
     url: String,
-    link_sharing: Boolean,
     cells: [{
       row: String,
       col: String,
