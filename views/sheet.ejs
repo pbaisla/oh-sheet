@@ -62,37 +62,17 @@
 
       var table = new Handsontable(container, settings);
 
-      setInterval(
-          function(){
-            var cells = [];
-            for(var i=0; i < data.length; i++) {
-              for (var j=0; j < data.length; j++) {
-                if(data[i][j]) {
-                  cells.push({row: i, col: j, data: data[i][j]});
-                }
-              }
-            }
-            socket.emit('save', { url: url, cells: cells });
-          }, 60000);
+      function pushChange(changes,source) {
+        if(source == 'edit') {
+          var cellChange = [];
+          for(var i=0; i < changes.length; i++) {
+            cellChange.push({row:changes[i][0],col:changes[i][1], data: changes[i][3]});
+          }
+          socket.emit('save',{url : url , cells:cellChange} );
+        }
+      }
 
-	function pushChange(changes,source){
-		console.log(changes);
-		if(source=='edit')
-		{
-			var cellChange=[];
-			var change=[];
-			for(var i=0;i<changes.length;i++)
-				{
-					cellChange.push({row:changes[i][0],col:changes[i][1], data: changes[i][3]});
-				}
-			socket.emit('save',{url : url , cells:cellChange} );
-		}
-		console.log(cellChange);
-	}
-	
-
-	table.addHook('afterChange',pushChange);
-	
+      table.addHook('afterChange',pushChange);
     </script>
   </body>
 </html>
