@@ -18,9 +18,10 @@ router.get('/', function(req, res, next) {
 
 router.get('/sheet/:url', function(req, res, next) {
   var url = req.params.url;
-  Sheet.find({ url: url }, function(err, sheet) {
+  Sheet.findOne({ url: url }, function(err, sheet) {
     if(err)
       res.send(err);
+    console.log(sheet);
     res.render('sheet', { sheet: sheet.cells||[] });
   });
 });

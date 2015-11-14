@@ -31,7 +31,8 @@
       var data = [[]];
       var cells = <%- JSON.stringify(sheet) %>;
 
-      for(cell in cells) {
+      for(var i=0; i < cells.length; i++) {
+        var cell = cells[i];
         if(!data[cell.row]) {
           while(data.length != cell.row+1) {
             data.push(new Array());
