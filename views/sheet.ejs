@@ -83,9 +83,9 @@
 			var change=[];
 			for(var i=0;i<changes.length;i++)
 				{
-					cellChange.push({row:changes[i][0],col:changes[i][1], newVal: changes[i][3]});
+					cellChange.push({row:changes[i][0],col:changes[i][1], data: changes[i][3]});
 				}
-			socket.emit('edited',{url : url , cells:cellChange} );
+			socket.emit('save',{url : url , cells:cellChange} );
 		}
 		console.log(cellChange);
 	}

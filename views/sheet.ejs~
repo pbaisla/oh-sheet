@@ -31,7 +31,8 @@
       var data = [[]];
       var cells = <%- JSON.stringify(sheet) %>;
 
-      for(cell in cells) {
+      for(var i=0; i < cells.length; i++) {
+        var cell = cells[i];
         if(!data[cell.row]) {
           while(data.length != cell.row+1) {
             data.push(new Array());
@@ -84,7 +85,7 @@
 				{
 					cellChange.push({row:changes[i][0],col:changes[i][1], newVal: changes[i][3]});
 				}
-			socket.emit('edited',{url : url , cells:cellChange} );
+			socket.emit('save',{url : url , cells:cellChange} );
 		}
 		console.log(cellChange);
 	}
