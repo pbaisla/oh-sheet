@@ -21,22 +21,35 @@
     <div id="sheet" class="dataTable"></div>
     <script src="/socket.io/socket.io.js"></script>
     <script>
+      var url = window.location.pathname.split("/")[2];
       var socket = io.connect(window.location.origin);
-      socket.on('news', function (data) {
+      socket.on('sheet.url?', function(data) {
         console.log(data);
-        socket.emit('save', { url: window.location.pathname.split("/")[2] });
+        socket.emit('sheet.url', { url: url });
       });
 
-      var data = [];
+      var data = [[]];
       var cells = <%- JSON.stringify(sheet) %>;
 
       for(cell in cells) {
+        if(!data[cell.row]) {
+          while(data.length != cell.row+1) {
+            data.push(new Array());
+          }
+        }
+        if(!data[cell.row][cell.col]) {
+          while(data[cell.row].length != cell.col+1) {
+            data[cell.row].push(null);
+          }
+        }
         data[cell.row][cell.col] = cell.data;
       }
 
       var settings = {
-        startRows: 30,
-        startCols: 30,
+        afterChange: function(c, s) {console.log(c); console.log(s);},
+        data: data,
+        minRows: 30,
+        minCols: 30,
         minSpareCols: 1,
         minSpareRows: 1,
         rowHeaders: true,
@@ -44,13 +57,22 @@
         contextMenu: true
       };
 
-      if(data.length != 0) {
-        settings[data] = data;
-      }
-
       var container = document.querySelector('#sheet');
 
       var table = new Handsontable(container, settings);
+
+      setInterval(
+          function(){
+            var cells = [];
+            for(var i=0; i < data.length; i++) {
+              for (var j=0; j < data.length; j++) {
+                if(data[i][j]) {
+                  cells.push({row: i, col: j, data: data[i][j]});
+                }
+              }
+            }
+            socket.emit('save', { url: url, cells: cells });
+          }, 60000);
     </script>
   </body>
 </html>

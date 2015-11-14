@@ -26,13 +26,17 @@ router.get('/sheet/:url', function(req, res, next) {
 });
 
 module.exports = function(io) {
-  io.on('connection', function (socket) {
-    socket.emit('news', { hello: 'world' });
-    socket.on('save', function (data) {
+  io.on('connection', function(socket) {
+    socket.emit('sheet.url?');
+    socket.on('sheet.url', function(data){
+      socket.join(data.url);
+    });
+
+    socket.on('save', function(data) {
       Sheet.findOneAndUpdate(
           { url: data.url },
-          { url: data.url, cells: [] },
-          { upsert: true },
+          { url: data.url, cells: data.cells },
+          { upsert: true, new: true },
           function(err, sheet) {
             if(err)
               console.log(err);
