@@ -1,8 +1,10 @@
-body {
-  background-color: white;
-  margin: 20px;
+.page-header {
+  font-size: 1em;
+  margin: 0;
+  padding: 0px 10px;
 }
 
-h2 {
-  margin: 20px 0;
+#sheet {
+  position: absolute;
+  left: 0;
 }

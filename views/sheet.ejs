@@ -6,54 +6,51 @@
     <script src="/javascripts/jquery.min.js"></script>
     <script src="/javascripts/handsontable.full.js"></script>
     <script src="/javascripts/bootstrap.min.js"></script>
-    <link rel="stylesheet" href="/stylesheets/style.css">
     <link rel="stylesheet" href="/stylesheets/handsontable.bootstrap.css">
     <link rel="stylesheet" href="/stylesheets/bootstrap.min.css">
     <link rel="stylesheet" media="screen" href="/stylesheets/handsontable.full.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
   </head>
 
   <body>
 
     <div class="page-header">
-      <h1>Oh Sheet!</h1>
+      <h1>Oh Sheet! <small>Online collaborative spreadsheet editor</small></h1>
     </div>
 
-    <p class="lead"> 2 seconds after loading this page, at (2,2) value will be transformed to ss ; read comments for enlightment :)</p>
-    <div id="exampleGrid" class="dataTable"></div>
-
+    <div id="sheet" class="dataTable"></div>
+    <script src="/socket.io/socket.io.js"></script>
     <script>
-    var myData = [
-        ["", "Kia", "Nissan", "Toyota", "Honda"],
-        ["2008", 10, 11, 12, 13],
-        ["2009", 20, 11, 14, 13],
-        ["2010", 30, 15, 12, 13]
-        ],
-        container = document.querySelector('#exampleGrid');
+      var socket = io.connect(window.location.origin);
+      socket.on('news', function (data) {
+        console.log(data);
+        socket.emit('save', { url: window.location.pathname.split("/")[2] });
+      });
 
-    function func(changes ,  source){
-      alert(changes + " <-changed by" + " source ->" + source  );
-    }
+      var data = [];
+      var cells = <%- JSON.stringify(sheet) %>;
 
-    var hot = new Handsontable(container, {
-        data: myData,
-      // will have no effect until data is provided
-        startRows: 5,
-        startCols: 5,
+      for(cell in cells) {
+        data[cell.row][cell.col] = cell.data;
+      }
+
+      var settings = {
+        startRows: 30,
+        startCols: 30,
         minSpareCols: 1,
-        //always keep at least 1 spare row at the right
         minSpareRows: 1,
-        //always keep at least 1 spare row at the bottom,
         rowHeaders: true,
         colHeaders: true,
         contextMenu: true
-    });
+      };
 
-    //each change is reflected by this hook method
-    hot.addHook('afterChange',func ) ; //added listener to the change event
+      if(data.length != 0) {
+        settings[data] = data;
+      }
 
-    //remote updates can be done by using populateFromArray
-    //source is 'populateFromArray' so can be distinguish from normal 'edit'
-    setTimeout(function(){hot.populateFromArray(2,2,[['ss']],2,2);} , 2000);
+      var container = document.querySelector('#sheet');
+
+      var table = new Handsontable(container, settings);
     </script>
   </body>
 </html>

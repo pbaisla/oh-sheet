@@ -25,4 +25,21 @@ router.get('/sheet/:url', function(req, res, next) {
   });
 });
 
-module.exports = router;
+module.exports = function(io) {
+  io.on('connection', function (socket) {
+    socket.emit('news', { hello: 'world' });
+    socket.on('save', function (data) {
+      Sheet.findOneAndUpdate(
+          { url: data.url },
+          { url: data.url, cells: [] },
+          { upsert: true },
+          function(err, sheet) {
+            if(err)
+              console.log(err);
+            console.log(sheet.url + " saved");
+          }
+      );
+    });
+  });
+  return router;
+}
