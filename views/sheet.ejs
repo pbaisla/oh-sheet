@@ -27,14 +27,16 @@
         console.log(data);
         socket.emit('sheet.url', { url: url });
       });
-	
-      socket.on('changes',function(input) {
-	console.log(input);
-	for(var i=0;i<input.length;i++){
-		data[input[i].row][input[i].col]=input[i].data;
-		}
-	table.render();
-	});
+
+      socket.on('changes', applyChanges);
+
+      function applyChanges(input) {
+        console.log(input);
+        for(var i=0;i<input.length;i++){
+          data[input[i].row][input[i].col]=input[i].data;
+        }
+        table.render();
+      }
 
       var data = [[]];
       var cells = <%- JSON.stringify(sheet) %>;
@@ -71,7 +73,7 @@
       var table = new Handsontable(container, settings);
 
       function pushChange(changes,source) {
-        if(source == 'edit') {
+        if(source != 'loadData') {
           var cellChange = [];
           for(var i=0; i < changes.length; i++) {
             cellChange.push({row:changes[i][0],col:changes[i][1], data: changes[i][3]});
@@ -80,7 +82,39 @@
         }
       }
 
-      table.addHook('afterChange',pushChange);
+      function beforeChange(changes, source) {
+        if(source != 'loadData') {
+          socket.emit('requestForCommit', { changes: changes, id: socket.id, counter: count++ });
+        }
+      }
+
+      socket.on('commit', applyChanges);
+      socket.on('abort', applyChanges);
+
+      socket.on('prepareForCommit', function(input) {
+        if(socket.id != input.id) {
+          var okayToCommit = true;
+          for(var i=0; i < input.changes.length; i++) {
+            var row = input.changes[0];
+            var col = input.changes[1];
+            var oldData = input.changes[2];
+            if(data[row][col] != oldData) {
+              okayToCommit = false;
+              break;
+            }
+          }
+          if(okayToCommit) {
+            socket.emit('agreement', { id: input.id, counter: input.counter });
+          }
+          else {
+            socket.emit('disagreement', { id: input.id, counter: input.counter });
+          }
+        }
+      });
+
+      var count = 0;
+      table.addHook('afterChange', pushChange);
+      table.addHook('beforeChange', beforeChange);
     </script>
   </body>
 </html>
