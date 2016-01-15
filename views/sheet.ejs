@@ -43,12 +43,12 @@
 
         for(var i=0; i < sheet.length; i++) {
           var cell = sheet[i];
-          if(!data[cell.row]) {
+          if(cell.row >= data.length) {
             while(data.length != cell.row+1) {
               data.push(new Array());
             }
           }
-          if(!data[cell.row][cell.col]) {
+          if(cell.col >= data[cell.row].length) {
             while(data[cell.row].length != cell.col+1) {
               data[cell.row].push(null);
             }
