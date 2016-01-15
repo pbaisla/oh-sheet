@@ -38,23 +38,26 @@
         table.render();
       }
 
-      var data = [[]];
-      var cells = <%- JSON.stringify(sheet) %>;
+      <%
+        var data = [[]];
 
-      for(var i=0; i < cells.length; i++) {
-        var cell = cells[i];
-        if(!data[cell.row]) {
-          while(data.length != cell.row+1) {
-            data.push(new Array());
+        for(var i=0; i < sheet.length; i++) {
+          var cell = sheet[i];
+          if(!data[cell.row]) {
+            while(data.length != cell.row+1) {
+              data.push(new Array());
+            }
           }
-        }
-        if(!data[cell.row][cell.col]) {
-          while(data[cell.row].length != cell.col+1) {
-            data[cell.row].push(null);
+          if(!data[cell.row][cell.col]) {
+            while(data[cell.row].length != cell.col+1) {
+              data[cell.row].push(null);
+            }
           }
+          data[cell.row][cell.col] = cell.data;
         }
-        data[cell.row][cell.col] = cell.data;
-      }
+      %>
+
+      var data = <%- JSON.stringify(data) %>;
 
       var settings = {
         afterChange: function(c, s) {console.log(c); console.log(s);},
