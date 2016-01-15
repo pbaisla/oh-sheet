@@ -9,7 +9,8 @@ var socketio = require( "socket.io" );
 var routes = require('./routes/index');
 
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://127.0.0.1:27017/oh-sheet');
+var mongo_server = process.env.OPENSHIFT_MONGODB_DB_URL || 'mongodb://127.0.0.1:27017/';
+mongoose.connect(mongo_server + 'oh-sheet');
 
 var app = express();
 

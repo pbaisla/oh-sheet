@@ -12,7 +12,8 @@ var http = require('http');
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
+var port = normalizePort(process.env.OPENSHIFT_NODEJS_PORT || '3000');
+var ip = process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0';
 app.set('port', port);
 
 /**
@@ -31,7 +32,7 @@ io.attach(server);
  * Listen on provided port, on all network interfaces.
  */
 
-server.listen(port, "0.0.0.0");
+server.listen(port, ip);
 server.on('error', onError);
 server.on('listening', onListening);
 
